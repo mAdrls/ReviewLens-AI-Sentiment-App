@@ -1,0 +1,52 @@
+[
+  {
+    "id": "prod-1",
+    "name": "SoundWave Pro ANC Headphones",
+    "category": "Audio & Electronics",
+    "description": "Premium over-ear wireless headphones featuring active noise cancellation, 40-hour battery life, and spatial audio support.",
+    "price": 199.99,
+    "rating_sample": 4.3,
+    "image_url": "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=500&auto=format&fit=crop&q=60",
+    "features": ["Active Noise Cancellation", "40-hour Battery", "Memory Foam Earcups", "Bluetooth 5.3", "Built-in Mic"]
+  },
+  {
+    "id": "prod-2",
+    "name": "AeroPulse Smart Fitness Watch",
+    "category": "Wearables & Fitness",
+    "description": "Sleek biometric smartwatch with continuous heart rate tracking, AMOLED display, GPS tracking, and sleep quality analytics.",
+    "price": 149.99,
+    "rating_sample": 3.8,
+    "image_url": "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=500&auto=format&fit=crop&q=60",
+    "features": ["AMOLED Touchscreen", "Heart Rate & SpO2", "Water Resistant 50m", "Multi-Sport Tracking", "GPS"]
+  },
+  {
+    "id": "prod-3",
+    "name": "Nova Ultra 5G Smartphone",
+    "category": "Smartphones & Mobile",
+    "description": "High-performance smartphone featuring a 108MP AI-enhanced camera array, 120Hz dynamic refresh display, and super-fast charging.",
+    "price": 799.99,
+    "rating_sample": 4.1,
+    "image_url": "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=500&auto=format&fit=crop&q=60",
+    "features": ["108MP Quad Camera", "120Hz OLED Display", "5000mAh Battery", "65W Fast Charging", "Snapdragon Chip"]
+  },
+  {
+    "id": "prod-4",
+    "name": "TitanBook Ultra 14-inch Laptop",
+    "category": "Computers & Laptops",
+    "description": "Ultra-thin aluminum productivity laptop with Intel Core processor, 16GB RAM, all-day battery life, and backlit keyboard.",
+    "price": 1199.99,
+    "rating_sample": 3.7,
+    "image_url": "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=500&auto=format&fit=crop&q=60",
+    "features": ["14-inch Retina Display", "16GB LPDDR5 RAM", "512GB NVMe SSD", "Backlit Keyboard", "1.2kg Lightweight"]
+  },
+  {
+    "id": "prod-5",
+    "name": "BoomEcho Waterproof Bluetooth Speaker",
+    "category": "Audio & Electronics",
+    "description": "Rugged IP67 waterproof portable speaker delivering 360-degree bass audio, 20-hour playback, and outdoor boost mode.",
+    "price": 79.99,
+    "rating_sample": 4.5,
+    "image_url": "https://images.unsplash.com/photo-1545454675-3531b543be5d?w=500&auto=format&fit=crop&q=60",
+    "features": ["IP67 Dust & Water Proof", "360-degree Deep Bass", "20-Hour Battery", "PartySync Pairing", "Type-C Fast Charge"]
+  }
+]

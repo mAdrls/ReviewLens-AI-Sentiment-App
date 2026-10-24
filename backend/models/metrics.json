@@ -1,0 +1,89 @@
+{
+  "model_name": "TF-IDF + Multinomial Logistic Regression",
+  "algorithm": "Multinomial Logistic Regression (L2 penalty, lbfgs)",
+  "vectorizer": "TF-IDF (unigrams & bigrams, sublinear tf)",
+  "trained_at": "2026-10-24 23:55:37",
+  "total_samples": 100,
+  "train_samples": 75,
+  "test_samples": 25,
+  "vocabulary_size": 867,
+  "classes": [
+    "negative",
+    "neutral",
+    "positive"
+  ],
+  "accuracy": 0.64,
+  "accuracy_pct": 64.0,
+  "classification_report": {
+    "negative": {
+      "precision": 0.8,
+      "recall": 0.5,
+      "f1-score": 0.6153846153846154,
+      "support": 8.0
+    },
+    "neutral": {
+      "precision": 0.5714285714285714,
+      "recall": 1.0,
+      "f1-score": 0.7272727272727273,
+      "support": 8.0
+    },
+    "positive": {
+      "precision": 0.6666666666666666,
+      "recall": 0.4444444444444444,
+      "f1-score": 0.5333333333333333,
+      "support": 9.0
+    },
+    "accuracy": 0.64,
+    "macro avg": {
+      "precision": 0.6793650793650793,
+      "recall": 0.6481481481481481,
+      "f1-score": 0.6253302253302254,
+      "support": 25.0
+    },
+    "weighted avg": {
+      "precision": 0.6788571428571428,
+      "recall": 0.64,
+      "f1-score": 0.6216503496503496,
+      "support": 25.0
+    }
+  },
+  "confusion_matrix": {
+    "labels": [
+      "negative",
+      "neutral",
+      "positive"
+    ],
+    "matrix": [
+      [
+        4,
+        2,
+        2
+      ],
+      [
+        0,
+        8,
+        0
+      ],
+      [
+        1,
+        4,
+        4
+      ]
+    ]
+  },
+  "hyperparameters": {
+    "C": 2.5,
+    "max_iter": 500,
+    "solver": "lbfgs",
+    "ngram_range": [
+      1,
+      2
+    ],
+    "sublinear_tf": true
+  },
+  "limitations": [
+    "Trained on a compact academic demonstration dataset of consumer electronics reviews.",
+    "Subtle sarcasm, irony, or double negatives may occasionally be misclassified.",
+    "Domain-specific slang or regional colloquialisms not in vocabulary are mapped to neutral priors."
+  ]
+}

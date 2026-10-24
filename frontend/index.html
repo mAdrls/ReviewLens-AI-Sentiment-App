@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ReviewLens AI - Product Review Sentiment Analysis Dashboard</title>
+  
+  <!-- Inter Font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Bootstrap 5 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  
+  <!-- Custom Styles -->
+  <link rel="stylesheet" href="css/styles.css">
+  
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@0.262.0/dist/lucide.min.js"></script>
+  
+  <!-- Chart.js 4.4 -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+<body>
+
+<div class="app-wrapper">
+  <!-- Toast Container -->
+  <div id="toast-container" style="position: fixed; top: 20px; right: 20px; z-index: 9999; max-width: 380px;"></div>
+
+  <!-- Sidebar -->
+  <aside class="app-sidebar">
+    <div class="sidebar-brand">
+      <div class="brand-icon">RL</div>
+      <div>
+        <h2 class="brand-title">ReviewLens AI</h2>
+        <span class="brand-badge">ML Sentiment Engine</span>
+      </div>
+    </div>
+
+    <div class="sidebar-nav">
+      <div class="nav-section-label">Core Navigation</div>
+      <a class="sidebar-link active" data-view="overview">
+        <i data-lucide="layout-dashboard"></i>
+        <span>Overview Dashboard</span>
+      </a>
+      <a class="sidebar-link" data-view="products">
+        <i data-lucide="shopping-bag"></i>
+        <span>Product Explorer</span>
+      </a>
+      <a class="sidebar-link" data-view="analyzer">
+        <i data-lucide="sparkles"></i>
+        <span>Review Analyzer</span>
+      </a>
+
+      <div class="nav-section-label mt-3">Machine Learning</div>
+      <a class="sidebar-link" data-view="model-info">
+        <i data-lucide="cpu"></i>
+        <span>Model & Metrics</span>
+      </a>
+      <a class="sidebar-link" data-view="about">
+        <i data-lucide="info"></i>
+        <span>About & Demo Guide</span>
+      </a>
+    </div>
+
+    <div class="sidebar-footer">
+      <div id="backend-status" class="d-flex align-items-center">
+        <span class="status-indicator"></span> Checking API...
+      </div>
+      <span class="text-xs">v1.0.0</span>
+    </div>
+  </aside>
+
+  <!-- Main Content Panel -->
+  <main class="app-main">
+    <!-- Top Header -->
+    <header class="top-header">
+      <div class="header-title-box">
+        <h1 id="header-page-title">Sentiment Analytics Platform</h1>
+        <p>Real-time customer feedback intelligence powered by Scikit-learn NLP</p>
+      </div>
+      <div class="header-actions">
+        <button class="btn btn-sm btn-primary d-flex align-items-center gap-1" onclick="navigateTo('analyzer')">
+          <i data-lucide="plus-circle" style="width:16px;height:16px;"></i>
+          <span>Analyze Custom Review</span>
+        </button>
+      </div>
+    </header>
+
+    <div class="content-body">
+
+      <!-- ============================================================ -->
+      <!-- SECTION 1: OVERVIEW DASHBOARD                                -->
+      <!-- ============================================================ -->
+      <section id="view-overview" class="view-section active-view">
+        <!-- KPI Metrics Grid -->
+        <div class="row g-3 mb-4">
+          <div class="col-sm-6 col-xl-3">
+            <div class="kpi-card">
+              <div class="kpi-icon-wrap indigo">
+                <i data-lucide="message-square" style="width:24px;height:24px;"></i>
+              </div>
+              <div>
+                <div class="kpi-label">Analyzed Reviews</div>
+                <div class="kpi-val" id="kpi-total-reviews">--</div>
+                <p class="kpi-sub">Across 5 sample products</p>
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-6 col-xl-3">
+            <div class="kpi-card">
+              <div class="kpi-icon-wrap emerald">
+                <i data-lucide="smile" style="width:24px;height:24px;"></i>
+              </div>
+              <div>
+                <div class="kpi-label">Positive Sentiment</div>
+                <div class="kpi-val text-success" id="kpi-pos-pct">--%</div>
+                <p class="kpi-sub">Favorable customer feedback</p>
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-6 col-xl-3">
+            <div class="kpi-card">
+              <div class="kpi-icon-wrap amber">
+                <i data-lucide="meh" style="width:24px;height:24px;"></i>
+              </div>
+              <div>
+                <div class="kpi-label">Neutral Sentiment</div>
+                <div class="kpi-val text-warning" id="kpi-neu-pct">--%</div>
+                <p class="kpi-sub">Moderate & balanced ratings</p>
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-6 col-xl-3">
+            <div class="kpi-card">
+              <div class="kpi-icon-wrap rose">
+                <i data-lucide="frown" style="width:24px;height:24px;"></i>
+              </div>
+              <div>
+                <div class="kpi-label">Negative Sentiment</div>
+                <div class="kpi-val text-danger" id="kpi-neg-pct">--%</div>
+                <p class="kpi-sub">Critiques & pain points</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Highlights Row: Best Product & Needs Improvement -->
+        <div class="row g-3 mb-4">
+          <div class="col-md-6">
+            <div class="card-lens p-3 d-flex align-items-center gap-3" style="border-left: 4px solid var(--positive);">
+              <div class="rounded-circle p-2" style="background:var(--positive-bg); color:var(--positive);">
+                <i data-lucide="award" style="width:26px;height:26px;"></i>
+              </div>
+              <div>
+                <span class="text-xs text-uppercase fw-bold text-success">Highest Customer Satisfaction</span>
+                <h4 class="fs-6 fw-bold mb-0 text-dark" id="best-product-name">Loading...</h4>
+                <div class="small text-muted" id="best-product-score">--</div>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="card-lens p-3 d-flex align-items-center gap-3" style="border-left: 4px solid var(--negative);">
+              <div class="rounded-circle p-2" style="background:var(--negative-bg); color:var(--negative);">
+                <i data-lucide="alert-triangle" style="width:26px;height:26px;"></i>
+              </div>
+              <div>
+                <span class="text-xs text-uppercase fw-bold text-danger">Product Needing Attention</span>
+                <h4 class="fs-6 fw-bold mb-0 text-dark" id="worst-product-name">Loading...</h4>
+                <div class="small text-muted" id="worst-product-score">--</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Charts Grid -->
+        <div class="row g-4 mb-4">
+          <!-- Overall Doughnut Chart -->
+          <div class="col-lg-4">
+            <div class="card-lens h-100">
+              <div class="card-lens-header">
+                <div>
+                  <h3 class="card-lens-title">Overall Sentiment Split</h3>
+                  <div class="card-lens-subtitle">Distribution across all sample reviews</div>
+                </div>
+              </div>
+              <div class="card-lens-body d-flex flex-column justify-content-center" style="min-height: 280px;">
+                <div style="position: relative; height: 230px;">
+                  <canvas id="chart-overall-doughnut"></canvas>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Product Comparison Bar Chart -->
+          <div class="col-lg-8">
+            <div class="card-lens h-100">
+              <div class="card-lens-header">
+                <div>
+                  <h3 class="card-lens-title">Product Sentiment Comparison</h3>
+                  <div class="card-lens-subtitle">Cross-product sentiment breakdown (Positive vs Neutral vs Negative %)</div>
+                </div>
+              </div>
+              <div class="card-lens-body" style="min-height: 280px;">
+                <div style="position: relative; height: 240px;">
+                  <canvas id="chart-product-comparison"></canvas>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Recent Analyses Session List -->
+        <div class="card-lens">
+          <div class="card-lens-header">
+            <div>
+              <h3 class="card-lens-title">Recent Real-Time Predictions (Current Session)</h3>
+              <div class="card-lens-subtitle">In-memory review predictions evaluated during active server uptime</div>
+            </div>
+          </div>
+          <div class="card-lens-body pt-1" id="recent-analyses-list">
+            <!-- Populated dynamically -->
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================ -->
+      <!-- SECTION 2: PRODUCT EXPLORER                                  -->
+      <!-- ============================================================ -->
+      <section id="view-products" class="view-section">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+          <div>
+            <h2 class="fs-4 fw-bold mb-1">Predefined Product Catalog</h2>
+            <p class="text-muted small mb-0">Browse predefined demonstration items and their automated sentiment metrics</p>
+          </div>
+          <div class="badge bg-white text-dark border px-3 py-2 fw-semibold">
+            5 Preloaded Products • Local JSON Catalog
+          </div>
+        </div>
+
+        <div class="row g-4" id="products-grid">
+          <!-- Populated dynamically -->
+        </div>
+      </section>
+
+      <!-- ============================================================ -->
+      <!-- SECTION 3: PRODUCT SENTIMENT DETAILS                         -->
+      <!-- ============================================================ -->
+      <section id="view-product-detail" class="view-section">
+        <div class="mb-3">
+          <button class="btn btn-sm btn-link text-decoration-none ps-0 text-muted d-flex align-items-center gap-1" onclick="navigateTo('products')">
+            <i data-lucide="arrow-left" style="width:16px;height:16px;"></i> Back to Products Catalog
+          </button>
+        </div>
+
+        <!-- Product Hero Card -->
+        <div class="card-lens mb-4 p-4">
+          <div class="row align-items-center">
+            <div class="col-md-8">
+              <span class="badge bg-primary-subtle text-primary mb-2 fw-semibold" id="detail-product-category">Category</span>
+              <h2 class="fs-3 fw-bold mb-2 text-dark" id="detail-product-name">Product Name</h2>
+              <p class="text-muted mb-3" id="detail-product-desc">Product description goes here.</p>
+              
+              <div id="detail-product-features" class="mb-3"></div>
+
+              <div class="alert alert-light border mb-0 d-flex gap-2">
+                <i data-lucide="sparkles" class="text-primary flex-shrink-0 mt-1" style="width:18px;height:18px;"></i>
+                <div>
+                  <div class="fw-semibold text-xs text-uppercase text-primary">Automated AI Sentiment Summary</div>
+                  <div class="small text-secondary" id="detail-summary-text">Generating product synthesis...</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-md-4 mt-4 mt-md-0 text-center">
+              <div class="p-3 bg-light rounded-3 border">
+                <div class="text-xs text-muted text-uppercase fw-semibold mb-1">Demonstration Price</div>
+                <div class="fs-2 fw-bold text-dark mb-3" id="detail-product-price">$0.00</div>
+                <div style="position: relative; height: 160px; max-width: 220px; margin: 0 auto;">
+                  <canvas id="chart-detail-doughnut"></canvas>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Keyword Insights -->
+        <div class="row g-3 mb-4">
+          <div class="col-md-6">
+            <div class="card-lens p-3 h-100">
+              <h4 class="fs-6 fw-bold mb-2 d-flex align-items-center text-success gap-2">
+                <i data-lucide="thumbs-up" style="width:16px;height:16px;"></i> Common Positive Drivers
+              </h4>
+              <div id="detail-positive-keywords" class="d-flex flex-wrap gap-1"></div>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="card-lens p-3 h-100">
+              <h4 class="fs-6 fw-bold mb-2 d-flex align-items-center text-danger gap-2">
+                <i data-lucide="thumbs-down" style="width:16px;height:16px;"></i> Common Criticism Drivers
+              </h4>
+              <div id="detail-negative-keywords" class="d-flex flex-wrap gap-1"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Customer Reviews List -->
+        <div class="card-lens">
+          <div class="card-lens-header border-bottom">
+            <div>
+              <h3 class="card-lens-title">Sample Customer Reviews</h3>
+              <div class="card-lens-subtitle">Preloaded demonstration reviews classified by Scikit-learn pipeline</div>
+            </div>
+            <!-- Sentiment Filter Pills -->
+            <div class="d-flex gap-2">
+              <button class="filter-pill active" data-filter="all" onclick="filterProductReviews('all')">All</button>
+              <button class="filter-pill" data-filter="positive" onclick="filterProductReviews('positive')">Positive</button>
+              <button class="filter-pill" data-filter="neutral" onclick="filterProductReviews('neutral')">Neutral</button>
+              <button class="filter-pill" data-filter="negative" onclick="filterProductReviews('negative')">Negative</button>
+            </div>
+          </div>
+          <div class="card-lens-body" id="product-reviews-container">
+            <!-- Populated dynamically -->
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================ -->
+      <!-- SECTION 4: INDIVIDUAL REVIEW ANALYZER                        -->
+      <!-- ============================================================ -->
+      <section id="view-analyzer" class="view-section">
+        <div class="mb-4">
+          <h2 class="fs-4 fw-bold mb-1">Live Review Sentiment Analyzer</h2>
+          <p class="text-muted small mb-0">Type any custom customer review to test real-time classification, confidence score, and keyword extraction</p>
+        </div>
+
+        <div class="row g-4">
+          <!-- Input Box -->
+          <div class="col-lg-6">
+            <div class="analyzer-box h-100 d-flex flex-column">
+              <div class="d-flex justify-content-between align-items-center mb-2">
+                <label for="analyzer-input" class="fw-bold small text-uppercase text-muted">Customer Review Text</label>
+                <span class="text-xs text-muted" id="analyzer-char-count">0 / 4000 characters</span>
+              </div>
+
+              <textarea 
+                id="analyzer-input" 
+                class="review-textarea mb-3 flex-grow-1" 
+                placeholder="Enter a product review here... (e.g. 'The sound quality is crisp and comfortable, but charging took three hours.')"
+              ></textarea>
+
+              <div class="mb-3">
+                <span class="text-xs fw-semibold text-muted text-uppercase d-block mb-1">Click a Quick Demonstration Example:</span>
+                <div class="example-chips">
+                  <button class="chip-btn example-chip-btn" data-text="The sound quality is excellent and the battery lasts all day.">
+                    🎧 "The sound quality is excellent and the battery lasts all day."
+                  </button>
+                  <button class="chip-btn example-chip-btn" data-text="Terrible build quality. It stopped working after two days.">
+                    ⚠️ "Terrible build quality. It stopped working after two days."
+                  </button>
+                  <button class="chip-btn example-chip-btn" data-text="The product is okay, but nothing particularly impressive.">
+                    ⚖️ "The product is okay, but nothing particularly impressive."
+                  </button>
+                  <button class="chip-btn example-chip-btn" data-text="Comfortable to wear and very easy to use.">
+                    ✨ "Comfortable to wear and very easy to use."
+                  </button>
+                  <button class="chip-btn example-chip-btn" data-text="The battery drains quickly and the screen scratches easily.">
+                    🔋 "The battery drains quickly and the screen scratches easily."
+                  </button>
+                </div>
+              </div>
+
+              <div class="d-flex gap-2">
+                <button id="btn-analyze-review" class="btn btn-primary fw-semibold flex-grow-1 py-2 d-flex align-items-center justify-content-center gap-2">
+                  <span id="analyzer-spinner" class="spinner-border spinner-border-sm" style="display:none;" role="status"></span>
+                  <i data-lucide="zap" style="width:16px;height:16px;"></i>
+                  <span>Analyze Sentiment</span>
+                </button>
+                <button id="btn-clear-review" class="btn btn-outline-secondary py-2 px-3">Clear</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Output Panel -->
+          <div class="col-lg-6">
+            <!-- Empty state -->
+            <div id="analyzer-empty-placeholder" class="card-lens h-100 p-5 text-center d-flex flex-column justify-content-center align-items-center text-muted">
+              <div class="p-3 bg-light rounded-circle mb-3">
+                <i data-lucide="file-search" style="width:36px;height:36px;" class="text-muted"></i>
+              </div>
+              <h4 class="fs-6 fw-bold text-dark mb-1">Awaiting Review Submission</h4>
+              <p class="small text-muted mb-0" style="max-width: 300px;">
+                Type a custom review or click an example on the left to see Scikit-learn's real-time prediction and keyword attribution.
+              </p>
+            </div>
+
+            <!-- Result Card -->
+            <div id="analyzer-result-card" class="result-card h-100" style="display:none;">
+              <div class="d-flex justify-content-between align-items-start mb-3 border-bottom pb-3">
+                <div>
+                  <span class="text-xs text-uppercase text-muted fw-semibold">Predicted Sentiment</span>
+                  <div class="mt-1">
+                    <span id="res-sentiment-badge" class="badge-sentiment positive fs-6 py-2 px-3">
+                      POSITIVE
+                    </span>
+                  </div>
+                </div>
+                <div class="text-end">
+                  <span class="text-xs text-uppercase text-muted fw-semibold">Model Confidence</span>
+                  <div class="fs-4 fw-bold text-dark" id="res-confidence-pct">--%</div>
+                  <span class="badge bg-secondary-subtle text-secondary text-xs" id="res-confidence-level">High Confidence</span>
+                </div>
+              </div>
+
+              <!-- Probability Distribution Meter -->
+              <div class="mb-4">
+                <div class="text-xs text-uppercase text-muted fw-semibold mb-2">Class Probability Distribution</div>
+                
+                <div class="mb-2">
+                  <div class="d-flex justify-content-between text-xs mb-1">
+                    <span class="text-success fw-semibold">Positive</span>
+                    <span id="res-val-pos" class="text-muted">0%</span>
+                  </div>
+                  <div class="prob-meter">
+                    <div id="res-bar-pos" class="h-100 bg-success" style="width: 0%; transition: width 0.4s ease;"></div>
+                  </div>
+                </div>
+
+                <div class="mb-2">
+                  <div class="d-flex justify-content-between text-xs mb-1">
+                    <span class="text-warning fw-semibold">Neutral</span>
+                    <span id="res-val-neu" class="text-muted">0%</span>
+                  </div>
+                  <div class="prob-meter">
+                    <div id="res-bar-neu" class="h-100 bg-warning" style="width: 0%; transition: width 0.4s ease;"></div>
+                  </div>
+                </div>
+
+                <div class="mb-2">
+                  <div class="d-flex justify-content-between text-xs mb-1">
+                    <span class="text-danger fw-semibold">Negative</span>
+                    <span id="res-val-neg" class="text-muted">0%</span>
+                  </div>
+                  <div class="prob-meter">
+                    <div id="res-bar-neg" class="h-100 bg-danger" style="width: 0%; transition: width 0.4s ease;"></div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Keyword Attributions -->
+              <div class="mb-3">
+                <span class="text-xs text-uppercase text-muted fw-semibold d-block mb-1">Key Contributing Tokens (Explainable AI)</span>
+                <div id="res-keywords-box" class="d-flex flex-wrap gap-1"></div>
+              </div>
+
+              <!-- Model Explanation -->
+              <div class="p-3 bg-light rounded border mb-3">
+                <span class="text-xs text-uppercase text-primary fw-semibold d-block mb-1">Evaluation Insight</span>
+                <p class="small text-secondary mb-0" id="res-explanation">Analyzing...</p>
+              </div>
+
+              <div class="text-xs text-light d-flex justify-content-between">
+                <span>Model Pipeline: <code id="res-model-id" class="text-muted">reviewlens_v1</code></span>
+                <span>Calibrated Probabilities</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================ -->
+      <!-- SECTION 5: MODEL INFORMATION & METRICS                       -->
+      <!-- ============================================================ -->
+      <section id="view-model-info" class="view-section">
+        <div class="mb-4">
+          <h2 class="fs-4 fw-bold mb-1">Machine Learning Model & Architecture</h2>
+          <p class="text-muted small mb-0">Transparency report covering the NLP pipeline, evaluation metrics, and real test holdout performance</p>
+        </div>
+
+        <!-- Metrics KPI Cards -->
+        <div class="row g-3 mb-4">
+          <div class="col-sm-6 col-lg-3">
+            <div class="kpi-card">
+              <div class="kpi-icon-wrap emerald">
+                <i data-lucide="check-circle-2" style="width:24px;height:24px;"></i>
+              </div>
+              <div>
+                <div class="kpi-label">Holdout Accuracy</div>
+                <div class="kpi-val text-success" id="model-accuracy-kpi">--%</div>
+                <p class="kpi-sub">On unseen test split</p>
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-6 col-lg-3">
+            <div class="kpi-card">
+              <div class="kpi-icon-wrap indigo">
+                <i data-lucide="book-open" style="width:24px;height:24px;"></i>
+              </div>
+              <div>
+                <div class="kpi-label">Vocabulary Size</div>
+                <div class="kpi-val" id="model-vocab-size">--</div>
+                <p class="kpi-sub">Unigrams & bigrams</p>
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-6 col-lg-3">
+            <div class="kpi-card">
+              <div class="kpi-icon-wrap amber">
+                <i data-lucide="database" style="width:24px;height:24px;"></i>
+              </div>
+              <div>
+                <div class="kpi-label">Train Samples</div>
+                <div class="kpi-val" id="model-train-samples">--</div>
+                <p class="kpi-sub">Stratified training set</p>
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-6 col-lg-3">
+            <div class="kpi-card">
+              <div class="kpi-icon-wrap rose">
+                <i data-lucide="shield-check" style="width:24px;height:24px;"></i>
+              </div>
+              <div>
+                <div class="kpi-label">Test Samples</div>
+                <div class="kpi-val" id="model-test-samples">--</div>
+                <p class="kpi-sub">Evaluation holdout</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="row g-4 mb-4">
+          <!-- Classification Report Table -->
+          <div class="col-lg-7">
+            <div class="card-lens h-100">
+              <div class="card-lens-header">
+                <div>
+                  <h3 class="card-lens-title">Detailed Evaluation Report</h3>
+                  <div class="card-lens-subtitle">Precision, Recall, and F1-Scores on the test split</div>
+                </div>
+              </div>
+              <div class="card-lens-body">
+                <div class="table-responsive">
+                  <table class="table table-hover align-middle mb-0" style="font-size:0.88rem;">
+                    <thead class="table-light">
+                      <tr>
+                        <th>Class</th>
+                        <th>Precision</th>
+                        <th>Recall</th>
+                        <th>F1-Score</th>
+                        <th>Support</th>
+                      </tr>
+                    </thead>
+                    <tbody id="metrics-table-body">
+                      <!-- Populated dynamically -->
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Confusion Matrix Heatmap -->
+          <div class="col-lg-5">
+            <div class="card-lens h-100">
+              <div class="card-lens-header">
+                <div>
+                  <h3 class="card-lens-title">Confusion Matrix</h3>
+                  <div class="card-lens-subtitle">Actual vs Predicted classifications</div>
+                </div>
+              </div>
+              <div class="card-lens-body d-flex flex-column justify-content-center" id="confusion-matrix-box">
+                <!-- Populated dynamically -->
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Pipeline Workflow Architecture -->
+        <div class="card-lens mb-4 p-4">
+          <h3 class="fs-6 fw-bold mb-3 d-flex align-items-center gap-2">
+            <i data-lucide="git-merge" class="text-primary" style="width:18px;height:18px;"></i>
+            End-to-End NLP Pipeline Architecture
+          </h3>
+          <div class="row g-3 text-center">
+            <div class="col-md-3">
+              <div class="p-3 bg-light rounded border h-100">
+                <div class="fw-bold text-xs text-uppercase text-primary mb-1">Step 1</div>
+                <h5 class="fs-6 fw-bold">Text Preprocessing</h5>
+                <p class="text-muted text-xs mb-0">Lowercasing, regex tokenization, URL removal, English stopword filtration.</p>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="p-3 bg-light rounded border h-100">
+                <div class="fw-bold text-xs text-uppercase text-primary mb-1">Step 2</div>
+                <h5 class="fs-6 fw-bold">TF-IDF Vectorization</h5>
+                <p class="text-muted text-xs mb-0">Unigram and bigram extraction, sublinear term frequency scaling, feature sparse matrix.</p>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="p-3 bg-light rounded border h-100">
+                <div class="fw-bold text-xs text-uppercase text-primary mb-1">Step 3</div>
+                <h5 class="fs-6 fw-bold">Logistic Classifier</h5>
+                <p class="text-muted text-xs mb-0">Multinomial logistic regression with L2 regularization and L-BFGS optimization.</p>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="p-3 bg-light rounded border h-100">
+                <div class="fw-bold text-xs text-uppercase text-primary mb-1">Step 4</div>
+                <h5 class="fs-6 fw-bold">Explainability & Output</h5>
+                <p class="text-muted text-xs mb-0">Softmax class probabilities, keyword attribution scoring, and human-readable explanation.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Model Limitations -->
+        <div class="card-lens p-4">
+          <h3 class="fs-6 fw-bold text-dark mb-2 d-flex align-items-center gap-2">
+            <i data-lucide="alert-circle" class="text-warning" style="width:18px;height:18px;"></i>
+            Academic Model Limitations & Observations
+          </h3>
+          <ul class="text-secondary small mb-0 ps-3">
+            <li class="mb-1"><strong>Compact Training Set:</strong> Trained on a 100-sample academic demonstration dataset of consumer electronics reviews.</li>
+            <li class="mb-1"><strong>Sarcasm and Context:</strong> Sarcastic expressions (e.g. <em>"Great, another broken piece of plastic!"</em>) can challenge n-gram models because they contain positive words with negative intent.</li>
+            <li class="mb-1"><strong>Vocabulary Boundary:</strong> Slang or product-specific abbreviations not present in the TF-IDF vocabulary default towards neutral background priors.</li>
+            <li><strong>No Heavy Infrastructure:</strong> Designed to run in milliseconds on any lightweight student laptop without GPUs, cloud endpoints, or external dependencies.</li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- ============================================================ -->
+      <!-- SECTION 6: ABOUT & DEMO GUIDE                                -->
+      <!-- ============================================================ -->
+      <section id="view-about" class="view-section">
+        <div class="mb-4">
+          <h2 class="fs-4 fw-bold mb-1">About ReviewLens AI & Project Guide</h2>
+          <p class="text-muted small mb-0">Project documentation, technology stack, and college demonstration cheat sheet</p>
+        </div>
+
+        <div class="row g-4 mb-4">
+          <div class="col-lg-7">
+            <div class="card-lens p-4 h-100">
+              <h3 class="fs-6 fw-bold mb-3 d-flex align-items-center gap-2">
+                <i data-lucide="layers" class="text-primary" style="width:18px;height:18px;"></i>
+                Project Purpose & Architecture
+              </h3>
+              <p class="small text-secondary">
+                <strong>ReviewLens AI</strong> is an end-to-end sentiment analytics web application created for academic demonstration. It enables e-commerce product managers and consumers to extract actionable insights from customer feedback without requiring complex database systems or costly external APIs.
+              </p>
+              <p class="small text-secondary">
+                Unlike static mockups, ReviewLens AI features a genuine Python machine learning classification pipeline built with Scikit-learn, exposed via a clean Flask REST API, and visualized using modern UI components and Chart.js.
+              </p>
+
+              <h4 class="fs-6 fw-bold mt-4 mb-2">Technology Stack</h4>
+              <div class="row g-2 text-xs">
+                <div class="col-sm-6">
+                  <div class="p-2 border rounded bg-light">
+                    <strong>Frontend:</strong> HTML5, CSS3, JavaScript (ES6+), Bootstrap 5, Chart.js, Lucide Icons.
+                  </div>
+                </div>
+                <div class="col-sm-6">
+                  <div class="p-2 border rounded bg-light">
+                    <strong>Backend:</strong> Python 3.11, Flask, Flask-CORS REST API.
+                  </div>
+                </div>
+                <div class="col-sm-6">
+                  <div class="p-2 border rounded bg-light">
+                    <strong>Machine Learning:</strong> Scikit-learn (TF-IDF + Logistic Regression), Joblib serialization.
+                  </div>
+                </div>
+                <div class="col-sm-6">
+                  <div class="p-2 border rounded bg-light">
+                    <strong>Persistence:</strong> Zero-database local JSON architecture and in-memory session history.
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Teacher Demonstration Cheat Sheet -->
+          <div class="col-lg-5">
+            <div class="card-lens p-4 h-100 bg-primary-subtle border-primary-subtle">
+              <h3 class="fs-6 fw-bold mb-3 text-primary d-flex align-items-center gap-2">
+                <i data-lucide="presentation" style="width:18px;height:18px;"></i>
+                Teacher Demonstration Walkthrough
+              </h3>
+              <p class="small text-dark mb-3">
+                Follow these 5 steps when demonstrating this project to your professor or evaluator:
+              </p>
+              <ol class="small text-dark ps-3 mb-0">
+                <li class="mb-2">
+                  <strong>Overview Dashboard:</strong> Highlight the computed KPI metrics and show how the charts reflect the actual aggregation of sample reviews.
+                </li>
+                <li class="mb-2">
+                  <strong>Product Catalog:</strong> Open the Product Explorer, click on <em>SoundWave Pro Headphones</em>, and demonstrate the sentiment filter buttons (Positive, Neutral, Negative).
+                </li>
+                <li class="mb-2">
+                  <strong>Review Analyzer:</strong> Click on one of the preloaded example chips, then type a brand new original sentence (e.g. <em>"The battery lasted two hours and the mic sounds muffled"</em>) to prove the ML model evaluates live.
+                </li>
+                <li class="mb-2">
+                  <strong>Explainable AI:</strong> Show the probability distribution bars and keyword contribution chips that explain why the model made its prediction.
+                </li>
+                <li>
+                  <strong>Model Performance Page:</strong> Walk through the Precision/Recall table, the confusion matrix, and explain the TF-IDF + Logistic Regression pipeline.
+                </li>
+              </ol>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </main>
+</div>
+
+<!-- Bootstrap 5 JS Bundle -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- App Scripts -->
+<script src="js/api.js"></script>
+<script src="js/charts.js"></script>
+<script src="js/app.js"></script>
+
+</body>
+</html>

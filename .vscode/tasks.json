@@ -1,0 +1,30 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "1. Install Requirements",
+      "type": "shell",
+      "command": "pip install -r backend/requirements.txt",
+      "problemMatcher": []
+    },
+    {
+      "label": "2. Train Model",
+      "type": "shell",
+      "command": "python backend/ml/train_model.py",
+      "problemMatcher": []
+    },
+    {
+      "label": "3. Run Pytest Tests",
+      "type": "shell",
+      "command": "pytest backend/tests -v",
+      "problemMatcher": []
+    },
+    {
+      "label": "4. Start Flask App",
+      "type": "shell",
+      "command": "python backend/app.py",
+      "isBackground": true,
+      "problemMatcher": []
+    }
+  ]
+}
